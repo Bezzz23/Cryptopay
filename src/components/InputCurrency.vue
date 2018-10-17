@@ -87,9 +87,12 @@ export default {
       height: 40px;
       overflow: hidden;
       width: 70px;
-      
       border-top-right-radius: 4px;
       border-bottom-right-radius: 4px;
+      transition: all 0.3s;
+      &:hover {
+        background-color: #00b968;
+      }
       select {
         background: transparent;
         border: none;

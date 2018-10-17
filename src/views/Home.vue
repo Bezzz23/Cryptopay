@@ -40,14 +40,13 @@ import VueApexCharts from 'vue-apexcharts'
 import axios from 'axios'
 
 export default {
-  name: 'HelloWorld',
+  name: 'Home',
   beforeMount: function () {
     this.getChart(this.crypt.currency, this.fiat.currency)
     this.cryptChanged(this.crypt)
   },
   data: function () {
     return {
-      text: 'Test',
       currencyPrice: '',
       crypt: {
         text: '1',
@@ -74,26 +73,8 @@ export default {
           id: 'vuechart-example',
           height: 350,
         },
-        title: {
-          text: 'BTC/USD',
-          align: 'left'
-        },
         xaxis: {
           type: 'datetime',
-          tooltip: {
-              enabled: false
-          }
-        },
-        candlestick: {
-          colors: {
-            upward: '#3C90EB',
-            downward: '#DF7D46'
-          }
-        },
-        yaxis: {
-          tooltip: {
-              enabled: false
-          }
         }
       },
       series: [{
@@ -120,9 +101,7 @@ export default {
       let data = chartData.data.Data.map((item) => {
         return [item.time, [item.open, item.high, item.low, item.close]]
       })
-      this.chartOptions.title.text = `${crypt}/${fiat}`
       this.series = [{data}]
-      
     },
     async cryptCurrencyChanged (currency) {
       if (currency.currency === this.fiat.currency) {
@@ -157,6 +136,7 @@ export default {
       let fiatCurrency = this.fiat.currency
       this.fiat.currency = this.crypt.currency
       this.crypt.currency = fiatCurrency
+
       this.cryptChanged(this.crypt)
     }
   },
