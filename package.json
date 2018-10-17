@@ -10,6 +10,9 @@
   "dependencies": {
     "apexcharts": "^2.1.4",
     "axios": "^0.18.0",
+    "d3": "^5.7.0",
+    "moment": "^2.22.2",
+    "techan": "^0.8.0",
     "vue": "^2.5.17",
     "vue-apexcharts": "^1.2.2",
     "vue-router": "^3.0.1"

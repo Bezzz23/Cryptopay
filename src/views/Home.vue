@@ -30,6 +30,7 @@
     <div class="chart-wrap">
     <apexcharts height="600" type="candlestick" :options="chartOptions" :series="series"></apexcharts>
     </div>
+    <Graph v-bind:stock="stock" v-bind:graph="graph"/>
   </div>
 </template>
 
@@ -38,15 +39,20 @@ import InputCurrency from '@/components/InputCurrency.vue'
 import Header from '@/components/Header.vue'
 import VueApexCharts from 'vue-apexcharts'
 import axios from 'axios'
+import m from 'moment'
+import Graph from '@/components/Graph.vue'
 
 export default {
   name: 'Home',
   beforeMount: function () {
     this.getChart(this.crypt.currency, this.fiat.currency)
     this.cryptChanged(this.crypt)
+    this.search()
   },
   data: function () {
     return {
+      stock: {},
+      graph: {},
       currencyPrice: '',
       crypt: {
         text: '1',
@@ -77,12 +83,54 @@ export default {
           type: 'datetime',
         }
       },
-      series: [{
-        data: [0]
-      }]
+      series: []
     }
   },
   methods: {
+    init() {
+      this.stock = {};
+      this.graph = {};
+      this.error = "";
+    },
+    //search method, calls API
+    search() {
+      let url = `https://api.iextrading.com/1.0/stock/aapl/quote`;
+      this.init();
+      axios
+        .get(url)
+        .then(this.getGraphData)
+        .catch(this.handleErrors);
+    },
+    //gets chart data from the API
+    getGraphData(result) {
+      let gUrl = `https://api.iextrading.com/1.0/stock/aapl/chart/1m`;
+      this.stock = result.data;
+      axios
+        .get(gUrl)
+        .then(result => {
+          console.error(result);
+          let graph = result.data.map((item) => {
+            return {
+              date: m(item.date).format('YYYY-MM-DD'),
+              close: item.close,
+              low: item.low,
+              high: item.high,
+              volume: item.volumefrom,
+              open: item.open
+            }
+          })
+          this.graph = graph;
+        })
+        .catch(this.handleErrors);
+    },
+    //method to handle errors
+    handleErrors(err) {
+      if (err.status === 404) {
+        this.error = "The specified symbol could not be found...";
+      } else {
+        this.error = "There was an error retrieving the data...";
+      }
+    },
     async cryptChanged (currency) {
       this.crypt = currency
       const priceData = await this.getPriceForCoin(currency.currency, this.fiat.currency)
@@ -99,9 +147,19 @@ export default {
     async getChart (crypt, fiat) {
       const chartData = await axios.get(`https://min-api.cryptocompare.com/data/histoday?fsym=${crypt}&tsym=${fiat}&limit=150`)
       let data = chartData.data.Data.map((item) => {
-        return [item.time, [item.open, item.high, item.low, item.close]]
+        // return [item.time, [item.open, item.high, item.low, item.close]]
+        return {
+          date: m(item.time).utc().format('YYYY-MM-DD'),
+          // label: "Sep 17",
+          close: item.close,
+          low: item.low,
+          high: item.high,
+          open: item.open,
+          volume: item.volumefrom
+        }
       })
-      this.series = [{data}]
+      // this.series = [{data}]
+      this.series = data
     },
     async cryptCurrencyChanged (currency) {
       if (currency.currency === this.fiat.currency) {
@@ -143,7 +201,8 @@ export default {
   components: {
     InputCurrency,
     apexcharts: VueApexCharts,
-    Header
+    Header,
+    Graph
   }
 }
 </script>
