@@ -1,4 +1,4 @@
-# test
+# Project for Cryptopay
 
 ## Project setup
 ```
