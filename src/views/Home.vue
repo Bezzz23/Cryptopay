@@ -38,6 +38,7 @@ import InputCurrency from '@/components/InputCurrency.vue'
 import Header from '@/components/Header.vue'
 import VueApexCharts from 'vue-apexcharts'
 import axios from 'axios'
+import m from 'moment'
 
 let api = 'https://min-api.cryptocompare.com'
 
@@ -74,6 +75,9 @@ export default {
         chart: {
           id: 'vuechart-example',
           height: 350,
+          zoom: {
+              enabled: false,
+          }
         },
         xaxis: {
           type: 'datetime',
@@ -111,13 +115,14 @@ export default {
     async getChart (crypt, fiat) {
       let chartData
       try {
-        chartData = await axios.get(`${api}/data/histoday?fsym=${crypt}&tsym=${fiat}&limit=150`)
+        chartData = await axios.get(`${api}/data/histoday?fsym=${crypt}&tsym=${fiat}&limit=60&aggregate=1&e=CCCAGG`)
       } catch (err) {
         this.handleErrors(err)
       }
       let data = chartData.data.Data.map((item) => {
-        return [item.time, [item.open, item.high, item.low, item.close]]
+        return [m.unix(item.time).valueOf(), [item.open, item.high, item.low, item.close]]
       })
+      console.error(data);
       this.series = [{data}]
     },
     async cryptCurrencyChanged (currency) {
