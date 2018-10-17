@@ -39,6 +39,8 @@ import Header from '@/components/Header.vue'
 import VueApexCharts from 'vue-apexcharts'
 import axios from 'axios'
 
+let api = 'https://min-api.cryptocompare.com'
+
 export default {
   name: 'Home',
   beforeMount: function () {
@@ -85,19 +87,34 @@ export default {
   methods: {
     async cryptChanged (currency) {
       this.crypt = currency
-      const priceData = await this.getPriceForCoin(currency.currency, this.fiat.currency)
+      let priceData
+      try {
+        priceData = await this.getPriceForCoin(currency.currency, this.fiat.currency)
+      } catch (err) {
+        this.handleErrors(err)
+      }
       let price = priceData.data[this.fiat.currency]
       this.currencyPrice = price
-      this.fiat.text = currency.text * price + ''
+      this.fiat.text = (currency.text * price).toFixed(4) + ''
     },
     async fiatChanged (currency) {
       this.fiat = currency
-      const priceData = await this.getPriceForCoin(currency.currency, this.crypt.currency)
+      let priceData
+      try {
+        priceData = await this.getPriceForCoin(currency.currency, this.crypt.currency)
+      } catch (err) {
+        this.handleErrors(err)
+      }
       let price = priceData.data[this.crypt.currency]
-      this.crypt.text = currency.text * price + ''
+      this.crypt.text = (currency.text * price).toFixed(4) + ''
     },
     async getChart (crypt, fiat) {
-      const chartData = await axios.get(`https://min-api.cryptocompare.com/data/histoday?fsym=${crypt}&tsym=${fiat}&limit=150`)
+      let chartData
+      try {
+        chartData = await axios.get(`${api}/data/histoday?fsym=${crypt}&tsym=${fiat}&limit=150`)
+      } catch (err) {
+        this.handleErrors(err)
+      }
       let data = chartData.data.Data.map((item) => {
         return [item.time, [item.open, item.high, item.low, item.close]]
       })
@@ -109,10 +126,15 @@ export default {
       }
       this.crypt.currency = currency.currency
       this.getChart(this.crypt.currency, this.fiat.currency)
-      const priceData = await this.getPriceForCoin(this.crypt.currency, this.fiat.currency)
+      let priceData
+      try {
+        priceData = await this.getPriceForCoin(this.crypt.currency, this.fiat.currency)
+      } catch (err) {
+        this.handleErrors(err)
+      }
       let price = priceData.data[this.fiat.currency]
       this.currencyPrice = price
-      this.fiat.text = this.crypt.text * price + ''
+      this.fiat.text = (this.crypt.text * price).toFixed(4) + ''
     },
     async fiatCurrencyChanged (currency) {
       if (currency.currency === this.crypt.currency) {
@@ -120,13 +142,18 @@ export default {
       }
       this.fiat.currency = currency.currency
       this.getChart(this.crypt.currency, this.fiat.currency)
-      const priceData = await this.getPriceForCoin(this.crypt.currency, this.fiat.currency)
+      let priceData
+      try {
+        priceData = await this.getPriceForCoin(this.crypt.currency, this.fiat.currency)
+      } catch (err) {
+        this.handleErrors(err)
+      }
       let price = priceData.data[this.fiat.currency]
       this.currencyPrice = price
-      this.fiat.text = this.crypt.text * price + ''
+      this.fiat.text = (this.crypt.text * price).toFixed(4) + ''
     },
     getPriceForCoin (currency, otherCurrency) {
-      return axios.get(`https://min-api.cryptocompare.com/data/price?fsym=${currency}&tsyms=${otherCurrency}`)
+      return axios.get(`${api}/data/price?fsym=${currency}&tsyms=${otherCurrency}`)
     },
     async switchCurrency () {
       let fiatText = this.fiat.text
@@ -138,7 +165,14 @@ export default {
       this.crypt.currency = fiatCurrency
 
       this.cryptChanged(this.crypt)
-    }
+    },
+    handleErrors(err) {
+      if (err.status === 404) {
+        alert("The specified symbol could not be found...");
+      } else {
+        alert("There was an error retrieving the data...");
+      }
+    },
   },
   components: {
     InputCurrency,
