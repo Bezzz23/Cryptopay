@@ -16,7 +16,7 @@
         v-on:price-change="cryptChanged($event)"
         v-on:currency-change="cryptCurrencyChanged($event)"
       />
-      <div class="currencyInputsBlock__switch">
+      <div class="currencyInputsBlock__switch" v-on:click="switchCurrency">
         <img src="../assets/switch.svg" />
       </div>
       <InputCurrency
@@ -59,9 +59,13 @@ export default {
       },
       cryptOptions: [
         { text: 'BTC', value: 'BTC' },
-        { text: 'LTC', value: 'LTC' }
+        { text: 'LTC', value: 'LTC' },
+        { text: 'USD', value: 'USD' },
+        { text: 'RUB', value: 'RUB' }
       ],
       fiatOptions: [
+        { text: 'BTC', value: 'BTC' },
+        { text: 'LTC', value: 'LTC' },
         { text: 'USD', value: 'USD' },
         { text: 'RUB', value: 'RUB' }
       ],
@@ -92,7 +96,9 @@ export default {
           }
         }
       },
-      series: null
+      series: [{
+        data: [0]
+      }]
     }
   },
   methods: {
@@ -114,9 +120,14 @@ export default {
       let data = chartData.data.Data.map((item) => {
         return [item.time, [item.open, item.high, item.low, item.close]]
       })
+      this.chartOptions.title.text = `${crypt}/${fiat}`
       this.series = [{data}]
+      
     },
     async cryptCurrencyChanged (currency) {
+      if (currency.currency === this.fiat.currency) {
+        return alert('Please select other coin')
+      }
       this.crypt.currency = currency.currency
       this.getChart(this.crypt.currency, this.fiat.currency)
       const priceData = await this.getPriceForCoin(this.crypt.currency, this.fiat.currency)
@@ -125,6 +136,9 @@ export default {
       this.fiat.text = this.crypt.text * price + ''
     },
     async fiatCurrencyChanged (currency) {
+      if (currency.currency === this.crypt.currency) {
+        return alert('Please select other coin')
+      }
       this.fiat.currency = currency.currency
       this.getChart(this.crypt.currency, this.fiat.currency)
       const priceData = await this.getPriceForCoin(this.crypt.currency, this.fiat.currency)
@@ -134,6 +148,16 @@ export default {
     },
     getPriceForCoin (currency, otherCurrency) {
       return axios.get(`https://min-api.cryptocompare.com/data/price?fsym=${currency}&tsyms=${otherCurrency}`)
+    },
+    async switchCurrency () {
+      let fiatText = this.fiat.text
+      this.fiat.text = this.crypt.text
+      this.crypt.text = fiatText
+
+      let fiatCurrency = this.fiat.currency
+      this.fiat.currency = this.crypt.currency
+      this.crypt.currency = fiatCurrency
+      this.cryptChanged(this.crypt)
     }
   },
   components: {

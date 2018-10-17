@@ -36,6 +36,9 @@ export default {
   watch: {
     text: function (newVal, oldVal) {
       this.price = newVal
+    },
+    currency: function  (newVal, oldVal) {
+      this.mutatedCurrency = newVal
     }
   },
   computed: {
