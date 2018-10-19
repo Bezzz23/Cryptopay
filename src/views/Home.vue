@@ -119,9 +119,9 @@ export default {
       } catch (err) {
         this.handleErrors(err)
       }
-      let data = chartData.data.Data.map((item) => {
-        return [m.unix(item.time).valueOf(), [item.open, item.high, item.low, item.close]]
-      })
+      let data = chartData.data.Data.map((item) => (
+        [m.unix(item.time).valueOf(), [item.open, item.high, item.low, item.close]]
+      ))
       console.error(data);
       this.series = [{data}]
     },
