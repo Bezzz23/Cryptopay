@@ -37,7 +37,7 @@ import gCrosshair from '../lib/drawGraph.js';
   methods: {
     //computes chart dimensions based on page width
     computeDimensions() {
-      var graphEl = document.getElementById("graph");
+      let graphEl = document.getElementById("graph");
       this.width = graphEl.offsetWidth;
     },
     //removes current chart
@@ -48,8 +48,8 @@ import gCrosshair from '../lib/drawGraph.js';
     redrawGraph() {
       this.cleanupGraph();
       this.computeDimensions();
-      var x = this.graph.length - 1;
-      var y = this.graph[x].open;
+      let x = this.graph.length - 1;
+      let y = this.graph[x].open;
       gCrosshair(
         this.graph,
         this.stock.companyName,

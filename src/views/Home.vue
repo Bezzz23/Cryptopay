@@ -169,6 +169,7 @@ export default {
       this.crypt.currency = fiatCurrency
 
       this.cryptChanged(this.crypt)
+      this.getChart(this.crypt.currency, this.fiat.currency)
     },
     handleErrors(err) {
       if (err.status === 404) {
