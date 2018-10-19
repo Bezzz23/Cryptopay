@@ -1,11 +1,13 @@
 <template>
   <div class="hello">
-    <div class="graph row" id="graph"></div>
+    <div class="graph-wrap">
+      <div class="graph row" id="graph"></div>
+    </div>
   </div>
 </template>
 
 <script>
-import gCrosshair from '../lib/g-crosshair.js';
+import gCrosshair from '../lib/drawGraph.js';
 
  export default {
   props: ["stock", "graph"],
@@ -60,7 +62,7 @@ import gCrosshair from '../lib/g-crosshair.js';
 };
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .quote {
   margin-top: 50px;
 }
@@ -73,32 +75,60 @@ import gCrosshair from '../lib/g-crosshair.js';
 .quote .row:nth-child(odd) {
   background-color: #f0f0f0;
 }
+.graph-wrap {
+  background: #273652;
+  padding: 20px;
+}
 .graph {
   font-size: 10px;
-  margin-top: 50px;
+  // margin-top: 50px;
 }
 path.candle {
-  stroke: #000000;
+  stroke: #yellow;
 }
 path.candle.body {
   stroke-width: 0;
 }
 path.candle.up {
-  fill: #00aa00;
-  stroke: #00aa00;
+  fill: #27DC8D;
+  stroke: #27DC8D;
+}
+path.candle.wick.up {
+  fill: red;
 }
 path.candle.down {
-  fill: #ff0000;
-  stroke: #ff0000;
+  fill: #FF2752;
+  stroke: #FF2752;
+}
+text.coords {
+  stroke: white;
 }
 .crosshair {
   cursor: crosshair;
 }
 .crosshair path.wire {
-  stroke: #dddddd;
+  stroke: #af4c4c;
   stroke-dasharray: 1, 1;
 }
 .crosshair .axisannotation path {
   fill: #dddddd;
+}
+
+g.x.axis {
+  stroke: white;
+}
+path.domain {
+  stroke: white;
+}
+
+g.tick {
+  stroke: white;
+  line: {
+    stroke: white;
+  }
+}
+
+.companyName {
+  stroke: white;
 }
 </style>
